@@ -11,9 +11,9 @@ public interface CategoryRepository {
 
     DbStatus update(Category category);
 
-    DbStatus delete(Integer id);
+    DbStatus delete(Long id);
 
-    Optional<Category> findOneById(Integer id);
+    Optional<Category> findOneById(Long id);
 
     List<Category> findAll();
 }

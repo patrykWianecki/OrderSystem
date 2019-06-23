@@ -1,20 +1,20 @@
 package com.app.service.file;
 
-
 public interface FileDataOperations {
-    void addDataToDB();
 
-    void addCategoryFromFileToDB();
+    void addDataToDb();
 
-    void addCountryFromFileToDB();
+    void addCategoryFromFileToDb();
 
-    void addCustomerFromFileToDB();
+    void addCountryFromFileToDb();
 
-    void addProductFromFileToDB();
+    void addCustomerFromFileToDb();
 
-    void addProducerFromFileToDB();
+    void addProductFromFileToDb();
 
-    void addOrdersFromFileToDB();
+    void addProducerFromFileToDb();
+
+    void addOrdersFromFileToDb();
 
     void deleteDataFromDB();
 

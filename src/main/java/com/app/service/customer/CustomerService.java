@@ -4,5 +4,5 @@ import com.app.model.Customer;
 
 public interface CustomerService {
 
-    Customer mostPopularCustomer();
+    Customer findMostPopularCustomer();
 }

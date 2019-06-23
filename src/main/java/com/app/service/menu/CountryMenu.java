@@ -4,6 +4,7 @@ import com.app.model.Country;
 import com.app.model.State;
 import com.app.repository.country.CountryRepository;
 import com.app.repository.country.CountryRepositoryImpl;
+import com.app.service.tools.MenuTools;
 
 import java.util.Comparator;
 import java.util.Scanner;
@@ -15,9 +16,11 @@ class CountryMenu {
 
     private final static String TABLE_NAME = "country";
 
+    private static Scanner scanner = new Scanner(System.in);
+    private static State state;
+
     private CountryRepository countryRepository = new CountryRepositoryImpl();
-    private Scanner scanner = new Scanner(System.in);
-    private State state;
+    private MenuTools menuTools = new MenuTools();
 
     State printAvailableOperationsOnCountries() {
         showAvailableOperations(TABLE_NAME);
@@ -63,9 +66,9 @@ class CountryMenu {
         System.out.println("Enter country name:");
         String name = scanner.nextLine();
         countryRepository.add(Country
-                .builder()
-                .name(name)
-                .build()
+            .builder()
+            .name(name)
+            .build()
         );
         state = COUNTRY;
         return state;
@@ -73,14 +76,10 @@ class CountryMenu {
 
     private State printDeleteCountry() {
         System.out.println("Choose Country id from list to delete:");
-        countryRepository
-                .findAll()
-                .stream()
-                .sorted(Comparator.comparing(Country::getId))
-                .forEach(x -> System.out.println(x.getId() + ". " + x.getName()));
+        menuTools.showCountriesSortedById();
         System.out.println("0 - Go back");
 
-        int choice = scanner.nextInt();
+        long choice = scanner.nextLong();
         scanner.nextLine();
 
         if (choice == 0) {
@@ -95,21 +94,21 @@ class CountryMenu {
 
     private State printUpdateCountry() {
         countryRepository
-                .findAll()
-                .forEach(System.out::println);
+            .findAll()
+            .forEach(System.out::println);
 
         System.out.println("Choose id:");
-        int choice = scanner.nextInt();
+        long choice = scanner.nextLong();
         scanner.nextLine();
 
         System.out.println("Enter new Country name:");
         String name = scanner.nextLine();
 
         countryRepository.update(Country
-                .builder()
-                .id(choice)
-                .name(name)
-                .build()
+            .builder()
+            .id(choice)
+            .name(name)
+            .build()
         );
         state = COUNTRY;
         return state;
@@ -144,14 +143,10 @@ class CountryMenu {
     }
 
     private State printCountriesSortedById() {
-        countryRepository
-                .findAll()
-                .stream()
-                .sorted(Comparator.comparing(Country::getId))
-                .forEach(System.out::println);
+        menuTools.showCountriesSortedById();
         System.out.println("0 - Go back");
 
-        int choice = scanner.nextInt();
+        long choice = scanner.nextLong();
         scanner.nextLine();
 
         if (choice == 0) {
@@ -170,13 +165,13 @@ class CountryMenu {
 
     private State printCountriesSortedByName() {
         countryRepository
-                .findAll()
-                .stream()
-                .sorted(Comparator.comparing(Country::getName))
-                .forEach(System.out::println);
+            .findAll()
+            .stream()
+            .sorted(Comparator.comparing(Country::getName))
+            .forEach(System.out::println);
         System.out.println("0 - Go back");
 
-        int choice = scanner.nextInt();
+        long choice = scanner.nextLong();
         scanner.nextLine();
 
         if (choice == 0) {
@@ -224,8 +219,8 @@ class CountryMenu {
     private State printCountryWithChosenId() {
         System.out.println("Enter id:");
         System.out.println(countryRepository
-                .findOneById(scanner.nextInt())
-                .orElseThrow(() -> new NullPointerException("NO COUNTRY WITH CHOSEN ID"))
+            .findOneById(scanner.nextLong())
+            .orElseThrow(() -> new NullPointerException("NO COUNTRY WITH CHOSEN ID"))
         );
         state = COUNTRY;
         return state;
@@ -234,7 +229,7 @@ class CountryMenu {
     private State printCountryWithChosenName() {
         System.out.println("Enter name:");
         String name = scanner.nextLine();
-        int id = -1;
+        long id = -1;
         for (Country c : countryRepository.findAll()) {
             if (name.equals(c.getName())) {
                 id = c.getId();
@@ -242,8 +237,8 @@ class CountryMenu {
             }
         }
         System.out.println(countryRepository
-                .findOneById(id)
-                .orElseThrow(() -> new NullPointerException("NO COUNTRY WITH CHOSEN ID"))
+            .findOneById(id)
+            .orElseThrow(() -> new NullPointerException("NO COUNTRY WITH CHOSEN ID"))
         );
         state = COUNTRY;
         return state;

@@ -13,10 +13,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class Order {
-    private Integer id;
+    private Long id;
     private Integer quantity;
     private BigDecimal discount;
     private LocalDate date;
-    private Integer productId;
-    private Integer customerId;
+    private Long productId;
+    private Long customerId;
 }

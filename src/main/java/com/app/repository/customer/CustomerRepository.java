@@ -11,9 +11,9 @@ public interface CustomerRepository {
 
     DbStatus update(Customer customer);
 
-    DbStatus delete(Integer id);
+    DbStatus delete(Long id);
 
-    Optional<Customer> findOneById(Integer id);
+    Optional<Customer> findOneById(Long id);
 
     List<Customer> findAll();
 }

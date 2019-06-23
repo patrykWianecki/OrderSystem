@@ -17,39 +17,39 @@ import static com.app.exceptions.ExceptionCode.SERVICE;
 
 public class ServiceTools {
 
-    private static ProductRepository productRepository = new ProductRepositoryImpl();
-    private static ProducerRepository producerRepository = new ProducerRepositoryImpl();
-    private static CustomerRepository customerRepository = new CustomerRepositoryImpl();
-    private static CountryRepository countryRepository = new CountryRepositoryImpl();
-    private static CategoryRepository categoryRepository = new CategoryRepositoryImpl();
+    private ProductRepository productRepository = new ProductRepositoryImpl();
+    private ProducerRepository producerRepository = new ProducerRepositoryImpl();
+    private CustomerRepository customerRepository = new CustomerRepositoryImpl();
+    private CountryRepository countryRepository = new CountryRepositoryImpl();
+    private CategoryRepository categoryRepository = new CategoryRepositoryImpl();
 
-    public static Product findProductById(Order order) {
-        return productRepository
-                .findOneById(order.getProductId())
-                .orElseThrow(() -> new MyException(SERVICE, "Missing product with id " + order.getProductId()));
-    }
-
-    public static Producer findProducerById(Product product) {
-        return producerRepository
-                .findOneById(product.getProducerId())
-                .orElseThrow(() -> new MyException(SERVICE, "Missing producer with id " + product.getProducerId()));
-    }
-
-    public static Customer findCustomerById(Order order) {
-        return customerRepository
-                .findOneById(order.getCustomerId())
-                .orElseThrow(() -> new MyException(SERVICE, "Missing customer with id " + order.getCustomerId()));
-    }
-
-    public static Country findCountryById(Product product) {
-        return countryRepository
-                .findOneById(product.getCountryId())
-                .orElseThrow(() -> new MyException(SERVICE, "Missing producer with id " + product.getProducerId()));
-    }
-
-    public static Category findCategoryById(Product product) {
+    public Category findCategoryByProduct(Product product) {
         return categoryRepository
-                .findOneById(product.getCategoryId())
-                .orElseThrow(() -> new MyException(SERVICE, "Missing category with id " + product.getCategoryId()));
+            .findOneById(product.getCategoryId())
+            .orElseThrow(() -> new MyException(SERVICE, "Missing category with id " + product.getCategoryId()));
+    }
+
+    public Country findCountryByProduct(Product product) {
+        return countryRepository
+            .findOneById(product.getCountryId())
+            .orElseThrow(() -> new MyException(SERVICE, "Missing producer with id " + product.getProducerId()));
+    }
+
+    public Customer findCustomerByOrder(Order order) {
+        return customerRepository
+            .findOneById(order.getCustomerId())
+            .orElseThrow(() -> new MyException(SERVICE, "Missing customer with id " + order.getCustomerId()));
+    }
+
+    public Producer findProducerByProduct(Product product) {
+        return producerRepository
+            .findOneById(product.getProducerId())
+            .orElseThrow(() -> new MyException(SERVICE, "Missing producer with id " + product.getProducerId()));
+    }
+
+    public Product findProductByOrder(Order order) {
+        return productRepository
+            .findOneById(order.getProductId())
+            .orElseThrow(() -> new MyException(SERVICE, "Missing product with id " + order.getProductId()));
     }
 }

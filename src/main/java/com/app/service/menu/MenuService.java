@@ -8,8 +8,8 @@ import static com.app.model.State.INIT;
 
 public class MenuService {
 
-    private Scanner scanner = new Scanner(System.in);
-    private State state = State.INIT;
+    private static Scanner scanner = new Scanner(System.in);
+    private static State state = State.INIT;
 
     public void start() {
         menu();

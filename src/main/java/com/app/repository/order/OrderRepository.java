@@ -11,9 +11,9 @@ public interface OrderRepository {
 
     DbStatus update(Order orders);
 
-    DbStatus delete(Integer id);
+    DbStatus delete(Long id);
 
-    Optional<Order> findOneById(Integer id);
+    Optional<Order> findOneById(Long id);
 
     List<Order> findAll();
 }

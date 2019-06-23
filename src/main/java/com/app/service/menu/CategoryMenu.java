@@ -15,9 +15,10 @@ class CategoryMenu {
 
     private static final String TABLE_NAME = "category";
 
+    private static Scanner scanner = new Scanner(System.in);
+    private static State state;
+
     private CategoryRepository categoryRepository = new CategoryRepositoryImpl();
-    private Scanner scanner = new Scanner(System.in);
-    private State state;
 
     State printAvailableOperationsOnCategories() {
         showAvailableOperations(TABLE_NAME);
@@ -62,9 +63,7 @@ class CategoryMenu {
         System.out.println("Enter category name:");
         String name = scanner.nextLine();
         name = scanner.nextLine();
-        categoryRepository.add(Category.builder()
-                .name(name)
-                .build());
+        categoryRepository.add(Category.builder().name(name).build());
         state = State.CATEGORY;
         return state;
     }
@@ -72,13 +71,13 @@ class CategoryMenu {
     private State printDeleteCategory() {
         System.out.println("Choose Category id from list to delete:");
         categoryRepository
-                .findAll()
-                .stream()
-                .sorted(Comparator.comparing(Category::getId))
-                .forEach(x -> System.out.println(x.getId() + ". " + x.getName()));
+            .findAll()
+            .stream()
+            .sorted(Comparator.comparing(Category::getId))
+            .forEach(x -> System.out.println(x.getId() + ". " + x.getName()));
         System.out.println("0 - Go back");
 
-        int choice = scanner.nextInt();
+        long choice = scanner.nextLong();
         scanner.nextLine();
 
         if (choice == 0) {
@@ -93,21 +92,21 @@ class CategoryMenu {
 
     private State printUpdateCategory() {
         categoryRepository
-                .findAll()
-                .forEach(System.out::println);
+            .findAll()
+            .forEach(System.out::println);
 
         System.out.println("Choose id:");
-        int choice = scanner.nextInt();
+        long choice = scanner.nextLong();
         scanner.nextLine();
 
         System.out.println("Enter new Category name:");
         String name = scanner.nextLine();
 
         categoryRepository.update(Category
-                .builder()
-                .id(choice)
-                .name(name)
-                .build()
+            .builder()
+            .id(choice)
+            .name(name)
+            .build()
         );
         state = State.CATEGORY;
         return state;
@@ -143,13 +142,13 @@ class CategoryMenu {
 
     private State printCategoriesSortedById() {
         categoryRepository
-                .findAll()
-                .stream()
-                .sorted(Comparator.comparing(Category::getId))
-                .forEach(System.out::println);
+            .findAll()
+            .stream()
+            .sorted(Comparator.comparing(Category::getId))
+            .forEach(System.out::println);
         System.out.println("0 - Go back");
 
-        int choice = scanner.nextInt();
+        long choice = scanner.nextLong();
         scanner.nextLine();
 
         if (choice == 0) {
@@ -168,13 +167,13 @@ class CategoryMenu {
 
     private State printCategoriesSortedByName() {
         categoryRepository
-                .findAll()
-                .stream()
-                .sorted(Comparator.comparing(Category::getName))
-                .forEach(System.out::println);
+            .findAll()
+            .stream()
+            .sorted(Comparator.comparing(Category::getName))
+            .forEach(System.out::println);
         System.out.println("0 - Go back");
 
-        int choice = scanner.nextInt();
+        long choice = scanner.nextLong();
         scanner.nextLine();
 
         if (choice == 0) {
@@ -222,8 +221,8 @@ class CategoryMenu {
     private State printCategoryWithChosenId() {
         System.out.println("Enter id:");
         System.out.println(categoryRepository
-                .findOneById(scanner.nextInt())
-                .orElseThrow(() -> new NullPointerException("NO CATEGORY WITH CHOSEN ID"))
+            .findOneById(scanner.nextLong())
+            .orElseThrow(() -> new NullPointerException("NO CATEGORY WITH CHOSEN ID"))
         );
         state = State.CATEGORY;
         return state;
@@ -232,7 +231,7 @@ class CategoryMenu {
     private State printCategoryWithChosenName() {
         System.out.println("Enter name:");
         String name = scanner.nextLine();
-        int id = -1;
+        long id = -1;
         for (Category c : categoryRepository.findAll()) {
             if (name.equals(c.getName())) {
                 id = c.getId();
@@ -240,8 +239,8 @@ class CategoryMenu {
             }
         }
         System.out.println(categoryRepository
-                .findOneById(id)
-                .orElseThrow(() -> new NullPointerException("NO CATEGORY WITH CHOSEN NAME"))
+            .findOneById(id)
+            .orElseThrow(() -> new NullPointerException("NO CATEGORY WITH CHOSEN NAME"))
         );
         state = State.CATEGORY;
         return state;

@@ -15,19 +15,19 @@ import static com.app.exceptions.ExceptionCode.SERVICE;
 
 public class CustomerServiceImpl implements CustomerService {
 
-    private static OrderRepository ordersRepository = new OrderRepositoryImpl();
+    private OrderRepository ordersRepository = new OrderRepositoryImpl();
+    private ServiceTools serviceTools = new ServiceTools();
 
     @Override
-    public Customer mostPopularCustomer() {
-        return ordersRepository
-                .findAll()
-                .stream()
-                .map(ServiceTools::findCustomerById)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-                .entrySet()
-                .stream()
-                .max(Comparator.comparing(Map.Entry::getValue))
-                .map(Map.Entry::getKey)
-                .orElseThrow(() -> new MyException(SERVICE, "Missing most popular customer"));
+    public Customer findMostPopularCustomer() {
+        return ordersRepository.findAll()
+            .stream()
+            .map(serviceTools::findCustomerByOrder)
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Comparator.comparing(Map.Entry::getValue))
+            .map(Map.Entry::getKey)
+            .orElseThrow(() -> new MyException(SERVICE, "Missing most popular customer"));
     }
 }

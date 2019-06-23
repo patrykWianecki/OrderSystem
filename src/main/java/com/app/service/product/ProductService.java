@@ -4,5 +4,5 @@ import com.app.model.Product;
 
 public interface ProductService {
 
-    Product mostPopularProduct();
+    Product findMostPopularProduct();
 }

@@ -11,9 +11,9 @@ public interface CountryRepository {
 
     DbStatus update(Country country);
 
-    DbStatus delete(Integer id);
+    DbStatus delete(Long id);
 
-    Optional<Country> findOneById(Integer id);
+    Optional<Country> findOneById(Long id);
 
     List<Country> findAll();
 }

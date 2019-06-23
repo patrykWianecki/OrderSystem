@@ -21,14 +21,15 @@ import static com.app.model.State.OTHER;
 
 class OtherMenu {
 
+    private static Scanner scanner = new Scanner(System.in);
+    private static State state;
+
     private FileDataOperations fileDataOperations = new FileDataOperationsImpl();
     private CategoryService categoryService = new CategoryServiceImpl();
     private CountryService countryService = new CountryServiceImpl();
     private CustomerService customerService = new CustomerServiceImpl();
     private ProducerService producerService = new ProducerServiceImpl();
     private ProductService productService = new ProductServiceImpl();
-    private Scanner scanner = new Scanner(System.in);
-    private State state;
 
     State printOtherAvailableOperations() {
         System.out.println("Choose operation:");
@@ -74,7 +75,7 @@ class OtherMenu {
                 printProducersWithAveragePriceSpentOnTheirProduct();
                 break;
             case 10:
-                addDataToDB();
+                addDataToDb();
                 break;
             case 11:
                 deleteDataFromDB();
@@ -100,31 +101,31 @@ class OtherMenu {
     }
 
     private State printMostPopularCountry() {
-        System.out.println(countryService.mostPopularCountry());
+        System.out.println(countryService.findMostPopularCountry());
         state = OTHER;
         return state;
     }
 
     private State printMostPopularCustomer() {
-        System.out.println(customerService.mostPopularCustomer());
+        System.out.println(customerService.findMostPopularCustomer());
         state = OTHER;
         return state;
     }
 
     private State printMostPopularProducer() {
-        System.out.println(producerService.getMostPopularProducer());
+        System.out.println(producerService.findMostPopularProducer());
         state = OTHER;
         return state;
     }
 
     private State printMostPopularProduct() {
-        System.out.println(productService.mostPopularProduct());
+        System.out.println(productService.findMostPopularProduct());
         state = OTHER;
         return state;
     }
 
     private State printSortedCategoriesWithOrders() {
-        System.out.println(categoryService.sortedCategoriesWithOrders());
+        System.out.println(categoryService.findCategoriesWithSortedOrders());
         state = OTHER;
         return state;
     }
@@ -136,18 +137,18 @@ class OtherMenu {
     }
 
     private State printSortedProducersByOrdersNumber() {
-        System.out.println(producerService.sortProducersByTotalAmountSpentOnProducts());
+        System.out.println(producerService.findProducersSortedByTotalAmountSpentOnTheirProducts());
         state = OTHER;
         return state;
     }
 
     private State printProducersWithAveragePriceSpentOnTheirProduct() {
-        System.out.println(producerService.producersWithAveragePrice());
+        System.out.println(producerService.findProducersWithAveragePrice());
         state = OTHER;
         return state;
     }
 
-    private State addDataToDB() {
+    private State addDataToDb() {
         System.out.println("1 - add categories from file");
         System.out.println("2 - add countries from file");
         System.out.println("3 - add customers from file");
@@ -163,25 +164,25 @@ class OtherMenu {
 
         switch (choice) {
             case 1:
-                addCategoriesToDB();
+                addCategoriesToDb();
                 break;
             case 2:
-                addCountriesToDB();
+                addCountriesToDb();
                 break;
             case 3:
-                addCustomersToDB();
+                addCustomersToDb();
                 break;
             case 4:
-                addProductsToDB();
+                addProductsToDb();
                 break;
             case 5:
-                addProducersToDB();
+                addProducersToDb();
                 break;
             case 6:
-                addOrdersToDB();
+                addOrdersToDb();
                 break;
             case 7:
-                addAllToDB();
+                addAllToDb();
                 break;
             case 0:
                 state = OTHER;
@@ -194,44 +195,44 @@ class OtherMenu {
         return state;
     }
 
-    private State addCategoriesToDB() {
-        fileDataOperations.addCategoryFromFileToDB();
+    private State addCategoriesToDb() {
+        fileDataOperations.addCategoryFromFileToDb();
         state = OTHER;
         return state;
     }
 
-    private State addCountriesToDB() {
-        fileDataOperations.addCountryFromFileToDB();
+    private State addCountriesToDb() {
+        fileDataOperations.addCountryFromFileToDb();
         state = OTHER;
         return state;
     }
 
-    private State addCustomersToDB() {
-        fileDataOperations.addCustomerFromFileToDB();
+    private State addCustomersToDb() {
+        fileDataOperations.addCustomerFromFileToDb();
         state = OTHER;
         return state;
     }
 
-    private State addProductsToDB() {
-        fileDataOperations.addProductFromFileToDB();
+    private State addProductsToDb() {
+        fileDataOperations.addProductFromFileToDb();
         state = OTHER;
         return state;
     }
 
-    private State addProducersToDB() {
-        fileDataOperations.addProducerFromFileToDB();
+    private State addProducersToDb() {
+        fileDataOperations.addProducerFromFileToDb();
         state = OTHER;
         return state;
     }
 
-    private State addOrdersToDB() {
-        fileDataOperations.addOrdersFromFileToDB();
+    private State addOrdersToDb() {
+        fileDataOperations.addOrdersFromFileToDb();
         state = OTHER;
         return state;
     }
 
-    private State addAllToDB() {
-        fileDataOperations.addDataToDB();
+    private State addAllToDb() {
+        fileDataOperations.addDataToDb();
         state = OTHER;
         return state;
     }

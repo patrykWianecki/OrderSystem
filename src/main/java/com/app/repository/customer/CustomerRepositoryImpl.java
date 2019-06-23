@@ -3,6 +3,8 @@ package com.app.repository.customer;
 import com.app.connection.DbConnection;
 import com.app.connection.DbStatus;
 import com.app.connection.DbTables;
+import com.app.exceptions.ExceptionCode;
+import com.app.exceptions.MyException;
 import com.app.model.Customer;
 
 import java.sql.*;
@@ -18,17 +20,16 @@ public class CustomerRepositoryImpl implements CustomerRepository {
     public DbStatus add(Customer customer) {
         try {
             String sql = "insert into " + DbTables.Customer +
-                    " (name, surname, age, countryId) values (?,?,?,?);";
+                " (name, surname, age, countryId) values (?,?,?,?);";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, customer.getName());
             statement.setString(2, customer.getSurname());
-            statement.setInt(3, customer.getAge());
-            statement.setInt(4, customer.getCountryId());
+            statement.setLong(3, customer.getAge());
+            statement.setLong(4, customer.getCountryId());
             statement.execute();
             statement.close();
         } catch (Exception e) {
-            System.err.println("FAILED TO INSERT ROW IN Customer TABLE [ ERROR " + e.getMessage() + " ]");
-            return DbStatus.ERROR;
+            throw new MyException(ExceptionCode.REPOSITORY, "FAILED TO INSERT ROW IN Customer TABLE [ ERROR " + e.getMessage() + " ]");
         }
         return DbStatus.INSERTED;
     }
@@ -37,64 +38,61 @@ public class CustomerRepositoryImpl implements CustomerRepository {
     public DbStatus update(Customer customer) {
         try {
             String sql = "update " + DbTables.Customer + " set " +
-                    " name = ?, surname = ?, age = ?, countryId = ? where id = ?;";
+                " name = ?, surname = ?, age = ?, countryId = ? where id = ?;";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, customer.getName());
             statement.setString(2, customer.getSurname());
-            statement.setInt(3, customer.getAge());
-            statement.setInt(4, customer.getCountryId());
-            statement.setInt(5, customer.getId());
+            statement.setLong(3, customer.getAge());
+            statement.setLong(4, customer.getCountryId());
+            statement.setLong(5, customer.getId());
             statement.execute();
             statement.close();
         } catch (Exception e) {
-            System.err.println("FAILED TO UPDATE A ROW IN Customer TABLE [ ERROR " + e.getMessage() + " ]");
-            return DbStatus.ERROR;
+            throw new MyException(ExceptionCode.REPOSITORY, "FAILED TO UPDATE A ROW IN Customer TABLE [ ERROR " + e.getMessage() + " ]");
         }
         return DbStatus.UPDATED;
     }
 
     @Override
-    public DbStatus delete(Integer id) {
+    public DbStatus delete(Long id) {
         try {
             String sql = "delete from " + DbTables.Customer + " where id = ?;";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setInt(1, id);
+            statement.setLong(1, id);
             statement.execute();
             statement.close();
         } catch (Exception e) {
-            System.err.println("FAILED TO DELETE ROW FROM Customer TABLE [ ERROR " + e.getMessage() + " ]");
-            return DbStatus.ERROR;
+            throw new MyException(ExceptionCode.REPOSITORY, "FAILED TO DELETE ROW FROM Customer TABLE [ ERROR " + e.getMessage() + " ]");
         }
         return DbStatus.DELETED;
     }
 
     @Override
-    public Optional<Customer> findOneById(Integer id) {
+    public Optional<Customer> findOneById(Long id) {
         final String sql = "select id, name, surname, age, countryId from Customer where id = ?";
         PreparedStatement statement = null;
         ResultSet resultSet = null;
         try {
             statement = connection.prepareStatement(sql);
-            statement.setInt(1, id);
+            statement.setLong(1, id);
             resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
                 return Optional.of(
-                        Customer
-                                .builder()
-                                .id(resultSet.getInt(1))
-                                .name(resultSet.getString(2))
-                                .surname(resultSet.getString(3))
-                                .age(resultSet.getInt(4))
-                                .countryId(resultSet.getInt(5))
-                                .build()
+                    Customer
+                        .builder()
+                        .id(resultSet.getLong(1))
+                        .name(resultSet.getString(2))
+                        .surname(resultSet.getString(3))
+                        .age(resultSet.getInt(4))
+                        .countryId(resultSet.getLong(5))
+                        .build()
                 );
             }
 
             return Optional.empty();
         } catch (Exception e) {
-            System.err.println("FAILED TO GET ONE ROW FROM Customer TABLE [ ERROR " + e.getMessage() + " ]");
-            return Optional.empty();
+            throw new MyException(ExceptionCode.REPOSITORY, "FAILED TO GET ONE ROW FROM Customer TABLE [ ERROR " + e.getMessage() + " ]");
         } finally {
             try {
                 if (statement != null) {
@@ -105,7 +103,6 @@ public class CustomerRepositoryImpl implements CustomerRepository {
                 }
             } catch (SQLException e) {
                 System.err.println("FAILED TO CLOSE CONNECTION IN Customer TABLE [ ERROR " + e.getMessage() + " ]");
-                return Optional.empty();
             }
         }
     }
@@ -122,21 +119,19 @@ public class CustomerRepositoryImpl implements CustomerRepository {
             List<Customer> customers = new ArrayList<>();
             while (resultSet.next()) {
                 customers.add(
-                        Customer
-                                .builder()
-                                .id(resultSet.getInt(1))
-                                .name(resultSet.getString(2))
-                                .surname(resultSet.getString(3))
-                                .age(resultSet.getInt(4))
-                                .countryId(resultSet.getInt(5))
-                                .build()
+                    Customer
+                        .builder()
+                        .id(resultSet.getLong(1))
+                        .name(resultSet.getString(2))
+                        .surname(resultSet.getString(3))
+                        .age(resultSet.getInt(4))
+                        .countryId(resultSet.getLong(5))
+                        .build()
                 );
             }
             return customers;
-
         } catch (SQLException e) {
-            System.err.println("FAILED TO GET ALL ROWS FROM Customer TABLE [ ERROR " + e.getMessage() + " ]");
-            return null;
+            throw new MyException(ExceptionCode.REPOSITORY, "FAILED TO GET ALL ROWS FROM Customer TABLE [ ERROR " + e.getMessage() + " ]");
         } finally {
             try {
                 if (statement != null) {
@@ -147,7 +142,6 @@ public class CustomerRepositoryImpl implements CustomerRepository {
                 }
             } catch (SQLException e) {
                 System.err.println("FAILED TO CLOSE CONNECTION IN Customer TABLE [ ERROR " + e.getMessage() + " ]");
-                return null;
             }
         }
     }

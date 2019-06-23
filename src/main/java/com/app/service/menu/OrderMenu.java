@@ -14,21 +14,20 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Scanner;
 
-import static com.app.model.State.*;
 import static com.app.model.State.INIT;
 import static com.app.model.State.ORDER;
-import static com.app.service.tools.MenuTools.*;
 import static com.app.service.tools.MenuTools.showAvailableOperations;
 
 class OrderMenu {
 
     private static final String TABLE_NAME = "order";
 
+    private static Scanner scanner = new Scanner(System.in);
+    private static State state;
+
     private OrderRepository orderRepository = new OrderRepositoryImpl();
-    private Scanner scanner = new Scanner(System.in);
     private ProductRepository productRepository = new ProductRepositoryImpl();
     private CustomerRepository customerRepository = new CustomerRepositoryImpl();
-    private State state;
 
     State printAvailableOperationsOnOrders() {
         showAvailableOperations(TABLE_NAME);
@@ -72,15 +71,15 @@ class OrderMenu {
     private State printAddOrder() {
         System.out.println("Available products:");
         productRepository.findAll()
-                .forEach(s -> System.out.println(s.getId() + ". " + s.getName()));
+            .forEach(s -> System.out.println(s.getId() + ". " + s.getName()));
         System.out.println("Choose product id:");
-        int productId = scanner.nextInt();
+        long productId = scanner.nextLong();
         scanner.nextLine();
 
         customerRepository.findAll()
-                .forEach(s -> System.out.println(s.getId() + ". " + s.getName() + " " + s.getSurname()));
+            .forEach(s -> System.out.println(s.getId() + ". " + s.getName() + " " + s.getSurname()));
         System.out.println("Choose customer id:");
-        int customerId = scanner.nextInt();
+        long customerId = scanner.nextLong();
         scanner.nextLine();
 
         System.out.println("Enter Order quantity:");
@@ -96,13 +95,13 @@ class OrderMenu {
         LocalDate date = LocalDate.parse(scanner.nextLine());
 
         orderRepository.add(Order
-                .builder()
-                .quantity(quantity)
-                .discount(discount)
-                .date(date)
-                .productId(productId)
-                .customerId(customerId)
-                .build()
+            .builder()
+            .quantity(quantity)
+            .discount(discount)
+            .date(date)
+            .productId(productId)
+            .customerId(customerId)
+            .build()
         );
         state = ORDER;
         return state;
@@ -111,13 +110,13 @@ class OrderMenu {
     private State printDeleteOrder() {
         System.out.println("Choose Order id from list to delete:");
         orderRepository
-                .findAll()
-                .stream()
-                .sorted(Comparator.comparing(Order::getId))
-                .forEach(System.out::println);
+            .findAll()
+            .stream()
+            .sorted(Comparator.comparing(Order::getId))
+            .forEach(System.out::println);
         System.out.println("0 - Go back");
 
-        int choice = scanner.nextInt();
+        long choice = scanner.nextLong();
         scanner.nextLine();
 
         if (choice == 0) {
@@ -132,11 +131,11 @@ class OrderMenu {
 
     private State printUpdateOrder() {
         orderRepository
-                .findAll()
-                .forEach(System.out::println);
+            .findAll()
+            .forEach(System.out::println);
 
         System.out.println("Choose id:");
-        int choice = scanner.nextInt();
+        long choice = scanner.nextLong();
         scanner.nextLine();
 
         System.out.println("Enter Order quantity:");
@@ -152,22 +151,22 @@ class OrderMenu {
         LocalDate date = LocalDate.parse(scanner.nextLine());
 
         System.out.println("Enter Order product id:");
-        int productId = scanner.nextInt();
+        long productId = scanner.nextLong();
         scanner.nextLine();
 
         System.out.println("Enter Order customer id:");
-        int customerId = scanner.nextInt();
+        long customerId = scanner.nextLong();
         scanner.nextLine();
 
         orderRepository.update(Order
-                .builder()
-                .id(choice)
-                .quantity(quantity)
-                .discount(discount)
-                .date(date)
-                .productId(productId)
-                .customerId(customerId)
-                .build()
+            .builder()
+            .id(choice)
+            .quantity(quantity)
+            .discount(discount)
+            .date(date)
+            .productId(productId)
+            .customerId(customerId)
+            .build()
         );
         state = ORDER;
         return state;
@@ -213,13 +212,13 @@ class OrderMenu {
 
     private State printOrderortedById() {
         orderRepository
-                .findAll()
-                .stream()
-                .sorted(Comparator.comparing(Order::getId))
-                .forEach(System.out::println);
+            .findAll()
+            .stream()
+            .sorted(Comparator.comparing(Order::getId))
+            .forEach(System.out::println);
         System.out.println("0 - Go back");
 
-        int choice = scanner.nextInt();
+        long choice = scanner.nextLong();
         scanner.nextLine();
 
         if (choice == 0) {
@@ -250,13 +249,13 @@ class OrderMenu {
 
     private State getState(Comparator<Order> comparing) {
         orderRepository
-                .findAll()
-                .stream()
-                .sorted(comparing)
-                .forEach(System.out::println);
+            .findAll()
+            .stream()
+            .sorted(comparing)
+            .forEach(System.out::println);
         System.out.println("0 - Go back");
 
-        int choice = scanner.nextInt();
+        long choice = scanner.nextLong();
         scanner.nextLine();
 
         if (choice == 0) {
@@ -276,8 +275,8 @@ class OrderMenu {
     private State printOrderWithChosenId() {
         System.out.println("Enter id:");
         System.out.println(orderRepository
-                .findOneById(scanner.nextInt())
-                .orElseThrow(() -> new NullPointerException("NO ORDER WITH CHOSEN ID"))
+            .findOneById(scanner.nextLong())
+            .orElseThrow(() -> new NullPointerException("NO ORDER WITH CHOSEN ID"))
         );
         state = ORDER;
         return state;

@@ -8,7 +8,7 @@ import java.util.Map;
 
 public interface CategoryService {
 
-    Map<Category, List<Order>> sortedCategoriesWithOrders();
+    Map<Category, List<Order>> findCategoriesWithSortedOrders();
 
     Category findMostPopularCategory();
 }

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class Producer {
-    private Integer id;
+    private Long id;
     private String name;
-    private Integer countryId;
+    private Long countryId;
 }

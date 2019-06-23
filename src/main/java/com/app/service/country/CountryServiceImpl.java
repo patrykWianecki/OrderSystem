@@ -17,24 +17,26 @@ import static com.app.exceptions.ExceptionCode.SERVICE;
 public class CountryServiceImpl implements CountryService {
 
     private OrderRepository ordersRepository = new OrderRepositoryImpl();
+    private ServiceTools serviceTools = new ServiceTools();
 
+    // TODO
     @Override
     public List<Country> sortedCountriesByCustomerWhoSpentMost() {
         return null;
     }
 
     @Override
-    public Country mostPopularCountry() {
+    public Country findMostPopularCountry() {
         return ordersRepository
-                .findAll()
-                .stream()
-                .map(ServiceTools::findProductById)
-                .map(ServiceTools::findCountryById)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-                .entrySet()
-                .stream()
-                .max(Comparator.comparing(Map.Entry::getValue))
-                .map(Map.Entry::getKey)
-                .orElseThrow(() -> new MyException(SERVICE, "Missing most popular country"));
+            .findAll()
+            .stream()
+            .map(serviceTools::findProductByOrder)
+            .map(serviceTools::findCountryByProduct)
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Comparator.comparing(Map.Entry::getValue))
+            .map(Map.Entry::getKey)
+            .orElseThrow(() -> new MyException(SERVICE, "Missing most popular country"));
     }
 }

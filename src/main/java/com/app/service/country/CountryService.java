@@ -8,5 +8,5 @@ public interface CountryService {
 
     List<Country> sortedCountriesByCustomerWhoSpentMost();
 
-    Country mostPopularCountry();
+    Country findMostPopularCountry();
 }

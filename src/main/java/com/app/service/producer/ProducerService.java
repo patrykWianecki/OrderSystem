@@ -6,13 +6,11 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-
 public interface ProducerService {
 
-    List<Producer> sortProducersByTotalAmountSpentOnProducts();
+    List<Producer> findProducersSortedByTotalAmountSpentOnTheirProducts();
 
-    Map<Producer, BigDecimal> producersWithAveragePrice();
+    Map<Producer, BigDecimal> findProducersWithAveragePrice();
 
-    Producer getMostPopularProducer();
-
+    Producer findMostPopularProducer();
 }

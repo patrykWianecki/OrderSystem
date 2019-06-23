@@ -6,80 +6,104 @@ import com.app.model.Producer;
 import com.app.model.Product;
 import com.app.repository.order.OrderRepository;
 import com.app.repository.order.OrderRepositoryImpl;
-import com.app.repository.producer.ProducerRepository;
-import com.app.repository.producer.ProducerRepositoryImpl;
 import com.app.service.tools.ServiceTools;
+
+import org.eclipse.collections.impl.collector.Collectors2;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.app.exceptions.ExceptionCode.SERVICE;
-import static com.app.service.tools.ServiceTools.findProductById;
 
 public class ProducerServiceImpl implements ProducerService {
-    private ProducerRepository producerRepository = new ProducerRepositoryImpl();
+
     private OrderRepository ordersRepository = new OrderRepositoryImpl();
+    private ServiceTools serviceTools = new ServiceTools();
 
     @Override
-    public List<Producer> sortProducersByTotalAmountSpentOnProducts() {
-        return ordersRepository
-                .findAll()
-                .stream()
-                .map(ServiceTools::findProductById)
-                .map(ServiceTools::findProducerById)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-                .entrySet()
-                .stream()
-                .sorted(Comparator.comparing(Map.Entry::getValue, Comparator.reverseOrder()))
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+    public List<Producer> findProducersSortedByTotalAmountSpentOnTheirProducts() {
+        return new ArrayList<>(collectOrdersWithPrices()
+            .entrySet()
+            .stream()
+            .collect(Collectors.groupingBy(
+                entry -> {
+                    Product product = serviceTools.findProductByOrder(entry.getKey());
+                    return serviceTools.findProducerByProduct(product);
+                },
+                Collectors2.summarizingBigDecimal(Map.Entry::getValue))
+            ).entrySet()
+            .stream()
+            .collect(Collectors.toMap(
+                Map.Entry::getKey,
+                sum -> sum
+                    .getValue()
+                    .getSum())
+            ).entrySet()
+            .stream()
+            .sorted(Comparator.comparing(Map.Entry::getValue, Comparator.reverseOrder()))
+            .collect(Collectors.toMap(
+                Map.Entry::getKey,
+                Map.Entry::getValue,
+                (c1, c2) -> c1,
+                LinkedHashMap::new)
+            ).keySet()
+        );
     }
 
-    // poprawić to gówno
+    private Map<Order, BigDecimal> collectOrdersWithPrices() {
+        return ordersRepository
+            .findAll()
+            .stream()
+            .collect(Collectors.toMap(
+                order -> order,
+                value -> {
+                    Product product = serviceTools.findProductByOrder(value);
+
+                    BigDecimal price = product
+                        .getPrice()
+                        .multiply(BigDecimal.valueOf(value.getQuantity()));
+                    BigDecimal discount = price.subtract((price
+                        .multiply(value.getDiscount()))
+                        .divide(BigDecimal.valueOf(100), RoundingMode.CEILING));
+
+                    return price.subtract(discount);
+                }
+            ));
+    }
+
     @Override
-    public Map<Producer, BigDecimal> producersWithAveragePrice() {
-        return ordersRepository
-                .findAll()
-                .stream()
-                .collect(Collectors.groupingBy(order -> producerRepository
-                        .findOneById(findProductById(order).getProducerId())
-                        .orElseThrow(NullPointerException::new)
-                ))
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> {
-                    BigDecimal sum = BigDecimal.ZERO;
-                    for (Order o : e.getValue()) {
-                        Product product = findProductById(o);
-                        sum = sum.add(product
-                                .getPrice()
-                                .multiply(BigDecimal.valueOf(o.getQuantity()))
-                                .multiply(BigDecimal.ONE.subtract(o.getDiscount()
-                                        .divide(BigDecimal.valueOf(100), 2, RoundingMode.FLOOR))));
-                    }
-                    return sum.divide(BigDecimal.valueOf(e.getValue()
-                            .size()), 2, RoundingMode.FLOOR);
-                }));
+    public Map<Producer, BigDecimal> findProducersWithAveragePrice() {
+        return collectOrdersWithPrices()
+            .entrySet()
+            .stream()
+            .collect(Collectors.groupingBy(entry -> {
+                    Product product = serviceTools.findProductByOrder(entry.getKey());
+                    return serviceTools.findProducerByProduct(product);
+                },
+                Collectors2.summarizingBigDecimal(Map.Entry::getValue)))
+            .entrySet()
+            .stream()
+            .collect(Collectors.toMap(
+                Map.Entry::getKey,
+                sum -> sum.getValue().getAverage().setScale(2, RoundingMode.CEILING))
+            );
     }
 
     @Override
-    public Producer getMostPopularProducer() {
+    public Producer findMostPopularProducer() {
         return ordersRepository
-                .findAll()
-                .stream()
-                .map(ServiceTools::findProductById)
-                .map(ServiceTools::findProducerById)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-                .entrySet()
-                .stream()
-                .max(Comparator.comparing(Map.Entry::getValue))
-                .map(Map.Entry::getKey)
-                .orElseThrow(() -> new MyException(SERVICE, "Missing most popular producer"));
+            .findAll()
+            .stream()
+            .map(serviceTools::findProductByOrder)
+            .map(serviceTools::findProducerByProduct)
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Comparator.comparing(Map.Entry::getValue))
+            .map(Map.Entry::getKey)
+            .orElseThrow(() -> new MyException(SERVICE, "Missing most popular producer"));
     }
-
 }

@@ -11,9 +11,9 @@ public interface ProductRepository {
 
     DbStatus update(Product product);
 
-    DbStatus delete(Integer id);
+    DbStatus delete(Long id);
 
-    Optional<Product> findOneById(Integer id);
+    Optional<Product> findOneById(Long id);
 
     List<Product> findAll();
 }

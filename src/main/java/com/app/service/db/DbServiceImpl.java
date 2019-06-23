@@ -2,6 +2,8 @@ package com.app.service.db;
 
 import com.app.connection.DbConnection;
 import com.app.connection.DbStatus;
+import com.app.exceptions.ExceptionCode;
+import com.app.exceptions.MyException;
 import com.app.model.*;
 import com.app.repository.category.CategoryRepository;
 import com.app.repository.category.CategoryRepositoryImpl;
@@ -13,6 +15,9 @@ import com.app.repository.producer.ProducerRepository;
 import com.app.repository.producer.ProducerRepositoryImpl;
 import com.app.repository.product.ProductRepository;
 import com.app.repository.product.ProductRepositoryImpl;
+
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -42,46 +47,46 @@ public class DbServiceImpl implements DbService {
     @Override
     public List<Customer> getCustomerByNameAndSurname(String customerName, String customerSurname) {
         return customerRepository
-                .findAll()
-                .stream()
-                .filter(customer -> customer.getName().equals(customerName) && customer.getSurname().equals(customerSurname))
-                .collect(Collectors.toList());
+            .findAll()
+            .stream()
+            .filter(customer -> customer.getName().equals(customerName) && customer.getSurname().equals(customerSurname))
+            .collect(Collectors.toList());
     }
 
     @Override
     public List<Country> getCountryByName(String countryName) {
         return countryRepository
-                .findAll()
-                .stream()
-                .filter(country -> country.getName().equals(countryName))
-                .collect(Collectors.toList());
+            .findAll()
+            .stream()
+            .filter(country -> country.getName().equals(countryName))
+            .collect(Collectors.toList());
     }
 
     @Override
     public List<Category> getCategoryByName(String categoryName) {
         return categoryRepository
-                .findAll()
-                .stream()
-                .filter(category -> category.getName().equals(categoryName))
-                .collect(Collectors.toList());
+            .findAll()
+            .stream()
+            .filter(category -> category.getName().equals(categoryName))
+            .collect(Collectors.toList());
     }
 
     @Override
     public List<Producer> getProducerByName(String producerName) {
         return producerRepository
-                .findAll()
-                .stream()
-                .filter(producer -> producer.getName().equals(producerName))
-                .collect(Collectors.toList());
+            .findAll()
+            .stream()
+            .filter(producer -> producer.getName().equals(producerName))
+            .collect(Collectors.toList());
     }
 
     @Override
     public List<Product> getProductByName(String productName) {
         return productRepository
-                .findAll()
-                .stream()
-                .filter(product -> product.getName().equals(productName))
-                .collect(Collectors.toList());
+            .findAll()
+            .stream()
+            .filter(product -> product.getName().equals(productName))
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -89,7 +94,7 @@ public class DbServiceImpl implements DbService {
         try {
             connection.setAutoCommit(false);
 
-            Customer customer;
+            Customer customer = null;
             Country country = null;
 
             // CUSTOMERS
@@ -129,8 +134,8 @@ public class DbServiceImpl implements DbService {
             try {
                 connection.rollback();
             } catch (Exception e1) {
-                System.err.println("FAILED TO ROLLBACK TRANSACTION WHILE INSERTING CLIENT WITH COUNTRY [ ERROR " + e.getMessage() + " ]");
-                return DbStatus.ERROR;
+                throw new MyException(ExceptionCode.SERVICE,
+                    "FAILED TO ROLLBACK TRANSACTION WHILE INSERTING CLIENT WITH COUNTRY [ ERROR " + e.getMessage() + " ]");
             }
             System.err.println("FAILED TO INSERT CLIENT WITH COUNTRY [ ERROR " + e.getMessage() + " ]");
             return DbStatus.ERROR;
@@ -139,7 +144,6 @@ public class DbServiceImpl implements DbService {
                 connection.setAutoCommit(true);
             } catch (Exception e) {
                 System.err.println("FAILED TO INSERT CLIENT WITH COUNTRY [ ERROR " + e.getMessage() + " ]");
-                return DbStatus.ERROR;
             }
         }
 
@@ -214,8 +218,8 @@ public class DbServiceImpl implements DbService {
             try {
                 connection.rollback();
             } catch (Exception e1) {
-                System.err.println("FAILED TO ROLLBACK TRANSACTION WHILE INSERTING PRODUCT WITH CATEGORY AND PRODUCER [ ERROR " + e.getMessage() + " ]");
-                return DbStatus.ERROR;
+                throw new MyException(ExceptionCode.SERVICE,
+                    "FAILED TO ROLLBACK TRANSACTION WHILE INSERTING PRODUCT WITH CATEGORY AND PRODUCER [ ERROR " + e.getMessage() + " ]");
             }
             System.err.println("FAILED TO INSERT PRODUCT WITH CATEGORY AND PRODCUER [ ERROR " + e.getMessage() + " ]");
             return DbStatus.ERROR;
@@ -224,7 +228,6 @@ public class DbServiceImpl implements DbService {
                 connection.setAutoCommit(true);
             } catch (Exception e) {
                 System.err.println("FAILED TO INSERT PRODUCT WITH CATEGORY AND PRODUCER [ ERROR " + e.getMessage() + " ]");
-                return DbStatus.ERROR;
             }
         }
 
@@ -265,8 +268,8 @@ public class DbServiceImpl implements DbService {
             try {
                 connection.rollback();
             } catch (Exception e1) {
-                System.err.println("FAILED TO ROLLBACK TRANSACTION WHILE INSERTING PRODUCER WITH COUNTRY [ ERROR " + e.getMessage() + " ]");
-                return DbStatus.ERROR;
+                throw new MyException(ExceptionCode.SERVICE,
+                    "FAILED TO ROLLBACK TRANSACTION WHILE INSERTING PRODUCER WITH COUNTRY [ ERROR " + e.getMessage() + " ]");
             }
             System.err.println("FAILED TO INSERT PRODUCER WITH COUNTRY [ ERROR " + e.getMessage() + " ]");
             return DbStatus.ERROR;
@@ -275,7 +278,6 @@ public class DbServiceImpl implements DbService {
                 connection.setAutoCommit(true);
             } catch (Exception e) {
                 System.err.println("FAILED TO INSERT PRODUCER WITH COUNTRY [ ERROR " + e.getMessage() + " ]");
-                return DbStatus.ERROR;
             }
         }
 

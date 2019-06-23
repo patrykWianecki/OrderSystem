@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class Customer {
-    private Integer id;
+    private Long id;
     private String name;
     private String surname;
     private Integer age;
-    private Integer countryId;
+    private Long countryId;
 }

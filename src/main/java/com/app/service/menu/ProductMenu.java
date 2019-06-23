@@ -1,36 +1,33 @@
 package com.app.service.menu;
 
-import com.app.model.Product;
-import com.app.model.State;
-import com.app.repository.category.CategoryRepository;
-import com.app.repository.category.CategoryRepositoryImpl;
-import com.app.repository.country.CountryRepository;
-import com.app.repository.country.CountryRepositoryImpl;
-import com.app.repository.producer.ProducerRepository;
-import com.app.repository.producer.ProducerRepositoryImpl;
-import com.app.repository.product.ProductRepository;
-import com.app.repository.product.ProductRepositoryImpl;
-
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.Scanner;
 
+import com.app.model.Product;
+import com.app.model.State;
+import com.app.repository.category.CategoryRepository;
+import com.app.repository.category.CategoryRepositoryImpl;
+import com.app.repository.producer.ProducerRepository;
+import com.app.repository.producer.ProducerRepositoryImpl;
+import com.app.repository.product.ProductRepository;
+import com.app.repository.product.ProductRepositoryImpl;
+import com.app.service.tools.MenuTools;
+
 import static com.app.model.State.*;
-import static com.app.model.State.INIT;
-import static com.app.model.State.PRODUCT;
 import static com.app.service.tools.MenuTools.*;
-import static com.app.service.tools.MenuTools.showAvailableOperations;
 
 class ProductMenu {
 
     private static final String TABLE_NAME = "product";
 
+    private static Scanner scanner = new Scanner(System.in);
+    private static State state;
+
     private ProductRepository productRepository = new ProductRepositoryImpl();
     private ProducerRepository producerRepository = new ProducerRepositoryImpl();
-    private CountryRepository countryRepository = new CountryRepositoryImpl();
     private CategoryRepository categoryRepository = new CategoryRepositoryImpl();
-    private Scanner scanner = new Scanner(System.in);
-    private State state;
+    private MenuTools menuTools = new MenuTools();
 
     State printAvailableOperationsOnProducts() {
         showAvailableOperations(TABLE_NAME);
@@ -80,49 +77,39 @@ class ProductMenu {
         scanner.nextLine();
 
         System.out.println("Available producers:");
-        producerRepository.findAll()
-                .forEach(s -> System.out.println(s.getId() + ". " + s.getName()));
+        producerRepository.findAll().forEach(s -> System.out.println(s.getId() + ". " + s.getName()));
         System.out.println("Choose producer id:");
-        int producerId = scanner.nextInt();
+        long producerId = scanner.nextLong();
         scanner.nextLine();
 
-        System.out.println("Available countries:");
-        countryRepository.findAll()
-                .forEach(s -> System.out.println(s.getId() + ". " + s.getName()));
+        menuTools.showAvailableCountries();
         System.out.println("Choose country id:");
-        int countryId = scanner.nextInt();
+        long countryId = scanner.nextLong();
         scanner.nextLine();
 
         System.out.println("Available categories:");
-        categoryRepository.findAll()
-                .forEach(s -> System.out.println(s.getId() + ". " + s.getName()));
+        categoryRepository.findAll().forEach(s -> System.out.println(s.getId() + ". " + s.getName()));
         System.out.println("Choose category id:");
-        int categoryId = scanner.nextInt();
+        long categoryId = scanner.nextLong();
         scanner.nextLine();
 
-        productRepository.add(Product
-                .builder()
-                .name(name)
-                .price(price)
-                .producerId(producerId)
-                .countryId(countryId)
-                .categoryId(categoryId)
-                .build()
-        );
+        productRepository.add(Product.builder()
+            .name(name)
+            .price(price)
+            .producerId(producerId)
+            .countryId(countryId)
+            .categoryId(categoryId)
+            .build());
         state = PRODUCT;
         return state;
     }
 
     private State printDeleteProduct() {
         System.out.println("Choose Product id from list to delete:");
-        productRepository
-                .findAll()
-                .stream()
-                .sorted(Comparator.comparing(Product::getId))
-                .forEach(x -> System.out.println(x.getId() + ". " + x.getName()));
+        menuTools.showProductsSortedById();
         System.out.println("0 - Go back");
 
-        int choice = scanner.nextInt();
+        long choice = scanner.nextLong();
         scanner.nextLine();
 
         if (choice == 0) {
@@ -136,12 +123,11 @@ class ProductMenu {
     }
 
     private State printUpdateProduct() {
-        productRepository
-                .findAll()
-                .forEach(System.out::println);
+        System.out.println("Choose Product id from list to update:");
+        menuTools.showProductsSortedById();
 
         System.out.println("Choose id:");
-        int choice = scanner.nextInt();
+        long choice = scanner.nextLong();
         scanner.nextLine();
 
         System.out.println("Enter new Product name:");
@@ -152,27 +138,25 @@ class ProductMenu {
         scanner.nextLine();
 
         System.out.println("Enter new Product producer id:");
-        int producerId = scanner.nextInt();
+        long producerId = scanner.nextLong();
         scanner.nextLine();
 
         System.out.println("Enter new Product country id:");
-        int countryId = scanner.nextInt();
+        long countryId = scanner.nextLong();
         scanner.nextLine();
 
         System.out.println("Enter new Product category id:");
-        int categoryId = scanner.nextInt();
+        long categoryId = scanner.nextLong();
         scanner.nextLine();
 
-        productRepository.update(Product
-                .builder()
-                .id(choice)
-                .name(name)
-                .price(price)
-                .producerId(producerId)
-                .countryId(countryId)
-                .categoryId(categoryId)
-                .build()
-        );
+        productRepository.update(Product.builder()
+            .id(choice)
+            .name(name)
+            .price(price)
+            .producerId(producerId)
+            .countryId(countryId)
+            .categoryId(categoryId)
+            .build());
         state = PRODUCT;
         return state;
     }
@@ -206,14 +190,10 @@ class ProductMenu {
     }
 
     private State printProductsSortedById() {
-        productRepository
-                .findAll()
-                .stream()
-                .sorted(Comparator.comparing(Product::getId))
-                .forEach(System.out::println);
+        menuTools.showProductsSortedById();
         System.out.println("0 - Go back");
 
-        int choice = scanner.nextInt();
+        long choice = scanner.nextLong();
         scanner.nextLine();
 
         if (choice == 0) {
@@ -231,14 +211,13 @@ class ProductMenu {
     }
 
     private State printProductsSortedByName() {
-        productRepository
-                .findAll()
-                .stream()
-                .sorted(Comparator.comparing(Product::getName))
-                .forEach(System.out::println);
+        productRepository.findAll()
+            .stream()
+            .sorted(Comparator.comparing(Product::getName))
+            .forEach(System.out::println);
         System.out.println("0 - Go back");
 
-        int choice = scanner.nextInt();
+        long choice = scanner.nextLong();
         scanner.nextLine();
 
         if (choice == 0) {
@@ -285,10 +264,8 @@ class ProductMenu {
 
     private State printProductWithChosenId() {
         System.out.println("Enter id:");
-        System.out.println(productRepository
-                .findOneById(scanner.nextInt())
-                .orElseThrow(() -> new NullPointerException("NO PRODUCT WITH CHOSEN ID"))
-        );
+        System.out.println(productRepository.findOneById(scanner.nextLong())
+            .orElseThrow(() -> new NullPointerException("NO PRODUCT WITH CHOSEN ID")));
         state = PRODUCT;
         return state;
     }
@@ -296,17 +273,15 @@ class ProductMenu {
     private State printProductWithChosenName() {
         System.out.println("Enter name:");
         String name = scanner.nextLine();
-        int id = -1;
+        long id = -1;
         for (Product c : productRepository.findAll()) {
             if (name.equals(c.getName())) {
                 id = c.getId();
                 break;
             }
         }
-        System.out.println(productRepository
-                .findOneById(id)
-                .orElseThrow(() -> new NullPointerException("NO PRODUCT WITH CHOSEN ID"))
-        );
+        System.out.println(productRepository.findOneById(id)
+            .orElseThrow(() -> new NullPointerException("NO PRODUCT WITH CHOSEN ID")));
         state = PRODUCT;
         return state;
     }

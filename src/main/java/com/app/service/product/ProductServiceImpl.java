@@ -15,19 +15,20 @@ import static com.app.exceptions.ExceptionCode.SERVICE;
 
 public class ProductServiceImpl implements ProductService {
 
-    private static OrderRepository ordersRepository = new OrderRepositoryImpl();
+    private OrderRepository ordersRepository = new OrderRepositoryImpl();
+    private ServiceTools serviceTools = new ServiceTools();
 
     @Override
-    public Product mostPopularProduct() {
+    public Product findMostPopularProduct() {
         return ordersRepository
-                .findAll()
-                .stream()
-                .map(ServiceTools::findProductById)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-                .entrySet()
-                .stream()
-                .max(Comparator.comparing(Map.Entry::getValue))
-                .map(Map.Entry::getKey)
-                .orElseThrow(() -> new MyException(SERVICE, "Missing most popular product"));
+            .findAll()
+            .stream()
+            .map(serviceTools::findProductByOrder)
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+            .entrySet()
+            .stream()
+            .max(Comparator.comparing(Map.Entry::getValue))
+            .map(Map.Entry::getKey)
+            .orElseThrow(() -> new MyException(SERVICE, "Missing most popular product"));
     }
 }

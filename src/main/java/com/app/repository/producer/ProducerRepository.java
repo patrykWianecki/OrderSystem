@@ -11,9 +11,9 @@ public interface ProducerRepository {
 
     DbStatus update(Producer producer);
 
-    DbStatus delete(Integer id);
+    DbStatus delete(Long id);
 
-    Optional<Producer> findOneById(Integer id);
+    Optional<Producer> findOneById(Long id);
 
     List<Producer> findAll();
 }

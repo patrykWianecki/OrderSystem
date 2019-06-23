@@ -2,10 +2,9 @@ package com.app.service.menu;
 
 import com.app.model.Customer;
 import com.app.model.State;
-import com.app.repository.country.CountryRepository;
-import com.app.repository.country.CountryRepositoryImpl;
 import com.app.repository.customer.CustomerRepository;
 import com.app.repository.customer.CustomerRepositoryImpl;
+import com.app.service.tools.MenuTools;
 
 import java.util.Comparator;
 import java.util.Scanner;
@@ -18,10 +17,11 @@ class CustomerMenu {
 
     private static final String TABLE_NAME = "customer";
 
+    private static Scanner scanner = new Scanner(System.in);
+    private static State state;
+
     private CustomerRepository customerRepository = new CustomerRepositoryImpl();
-    private CountryRepository countryRepository = new CountryRepositoryImpl();
-    private Scanner scanner = new Scanner(System.in);
-    private State state;
+    private MenuTools menuTools = new MenuTools();
 
     State printAvailableOperationsOnCustomers() {
         showAvailableOperations(TABLE_NAME);
@@ -73,20 +73,18 @@ class CustomerMenu {
         int age = scanner.nextInt();
         scanner.nextLine();
 
-        System.out.println("Available countries:");
-        countryRepository.findAll()
-                .forEach(s -> System.out.println(s.getId() + ". " + s.getName()));
+        menuTools.showAvailableCountries();
         System.out.println("Choose country id:");
-        int countryId = scanner.nextInt();
+        long countryId = scanner.nextLong();
         scanner.nextLine();
 
         customerRepository.add(Customer
-                .builder()
-                .name(name)
-                .surname(surname)
-                .age(age)
-                .countryId(countryId)
-                .build()
+            .builder()
+            .name(name)
+            .surname(surname)
+            .age(age)
+            .countryId(countryId)
+            .build()
         );
         state = CUSTOMER;
         return state;
@@ -94,14 +92,10 @@ class CustomerMenu {
 
     private State printDeleteCustomer() {
         System.out.println("Choose Customer id from list to delete:");
-        customerRepository
-                .findAll()
-                .stream()
-                .sorted(Comparator.comparing(Customer::getId))
-                .forEach(x -> System.out.println(x.getId() + ". " + x.getName()));
+        menuTools.showCustomersSortedById();
         System.out.println("0 - Go back");
 
-        int choice = scanner.nextInt();
+        long choice = scanner.nextLong();
         scanner.nextLine();
 
         if (choice == 0) {
@@ -116,11 +110,11 @@ class CustomerMenu {
 
     private State printUpdateCustomer() {
         customerRepository
-                .findAll()
-                .forEach(System.out::println);
+            .findAll()
+            .forEach(System.out::println);
 
         System.out.println("Choose id:");
-        int choice = scanner.nextInt();
+        long choice = scanner.nextLong();
         scanner.nextLine();
 
         System.out.println("Enter new Customer name:");
@@ -134,17 +128,17 @@ class CustomerMenu {
         scanner.nextLine();
 
         System.out.println("Enter new Customer country id:");
-        int countryId = scanner.nextInt();
+        long countryId = scanner.nextLong();
         scanner.nextLine();
 
         customerRepository.update(Customer
-                .builder()
-                .id(choice)
-                .name(name)
-                .surname(surname)
-                .age(age)
-                .countryId(countryId)
-                .build()
+            .builder()
+            .id(choice)
+            .name(name)
+            .surname(surname)
+            .age(age)
+            .countryId(countryId)
+            .build()
         );
 
         state = CUSTOMER;
@@ -180,14 +174,10 @@ class CustomerMenu {
     }
 
     private State printCustomersSortedById() {
-        customerRepository
-                .findAll()
-                .stream()
-                .sorted(Comparator.comparing(Customer::getId))
-                .forEach(System.out::println);
+        menuTools.showCustomersSortedById();
         System.out.println("0 - Go back");
 
-        int choice = scanner.nextInt();
+        long choice = scanner.nextLong();
         scanner.nextLine();
 
         if (choice == 0) {
@@ -206,13 +196,13 @@ class CustomerMenu {
 
     private State printCustomersSortedByName() {
         customerRepository
-                .findAll()
-                .stream()
-                .sorted(Comparator.comparing(Customer::getName))
-                .forEach(System.out::println);
+            .findAll()
+            .stream()
+            .sorted(Comparator.comparing(Customer::getName))
+            .forEach(System.out::println);
         System.out.println("0 - Go back");
 
-        int choice = scanner.nextInt();
+        long choice = scanner.nextLong();
         scanner.nextLine();
 
         if (choice == 0) {
@@ -260,8 +250,8 @@ class CustomerMenu {
     private State printCustomerWithChosenId() {
         System.out.println("Enter id:");
         System.out.println(customerRepository
-                .findOneById(scanner.nextInt())
-                .orElseThrow(() -> new NullPointerException("NO CUSTOMER WITH CHOSEN ID"))
+            .findOneById(scanner.nextLong())
+            .orElseThrow(() -> new NullPointerException("NO CUSTOMER WITH CHOSEN ID"))
         );
         state = CUSTOMER;
         return state;
@@ -270,7 +260,7 @@ class CustomerMenu {
     private State printCustomerWithChosenName() {
         System.out.println("Enter name:");
         String name = scanner.nextLine();
-        int id = -1;
+        long id = -1;
         for (Customer c : customerRepository.findAll()) {
             if (name.equals(c.getName())) {
                 id = c.getId();
@@ -278,8 +268,8 @@ class CustomerMenu {
             }
         }
         System.out.println(customerRepository
-                .findOneById(id)
-                .orElseThrow(() -> new NullPointerException("NO CUSTOMER WITH CHOSEN NAME"))
+            .findOneById(id)
+            .orElseThrow(() -> new NullPointerException("NO CUSTOMER WITH CHOSEN NAME"))
         );
         state = CUSTOMER;
         return state;
